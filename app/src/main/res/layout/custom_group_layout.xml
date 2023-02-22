@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:background="@color/backgroundColor"
+    android:padding="5dp"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <ImageView
+        android:id="@+id/profileImg"
+        android:layout_width="50dp"
+        android:layout_height="50dp"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintBottom_toBottomOf="parent"
+        android:src="@drawable/emoji"
+        android:padding="10dp"/>
+
+    <TextView
+        android:id="@+id/groupNameTxt"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintStart_toEndOf="@id/profileImg"
+        android:textSize="16sp"
+        android:text="Bachelors SE"
+        android:textColor="@color/secondaryColor"
+        android:layout_marginBottom="2dp"
+        android:layout_marginTop="10dp"/>
+
+    <TextView
+        android:id="@+id/latestMessageTxt"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:layout_constraintTop_toBottomOf="@id/groupNameTxt"
+        app:layout_constraintStart_toEndOf="@id/profileImg"
+        android:text="@string/hello"
+        android:textSize="16sp"
+        android:textColor="@color/secondaryColor"/>
+
+    <TextView
+        android:id="@+id/receivedMessageTime"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:layout_constraintTop_toTopOf="@id/latestMessageTxt"
+        app:layout_constraintBottom_toBottomOf="@id/latestMessageTxt"
+        app:layout_constraintEnd_toEndOf="parent"
+        android:text="@string/_10_20"
+        android:textSize="16sp"
+        android:textColor="@color/secondaryColor"/>
+
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="1dp"
+        android:layout_marginTop="5dp"
+        android:background="@color/secondaryColor"
+        app:layout_constraintTop_toBottomOf="@id/receivedMessageTime"
+        tools:layout_editor_absoluteX="-36dp" />
+
+</androidx.constraintlayout.widget.ConstraintLayout>

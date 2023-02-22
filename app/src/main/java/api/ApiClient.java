@@ -19,7 +19,7 @@ import java.util.*;
 
 
 
-@com.amazonaws.mobileconnectors.apigateway.annotation.Service(endpoint = "https://4fo72kdir9.execute-api.us-west-2.amazonaws.com/dev")
+@com.amazonaws.mobileconnectors.apigateway.annotation.Service(endpoint = "https://adr317sc95.execute-api.us-west-2.amazonaws.com/dev")
 public interface ApiClient {
 
 

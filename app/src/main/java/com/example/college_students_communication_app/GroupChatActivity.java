@@ -66,16 +66,6 @@ public class GroupChatActivity extends AppCompatActivity implements View.OnClick
         View view = binding.getRoot();
         setContentView(view);
 
-        try {
-            Amplify.addPlugin(new AWSApiPlugin());
-            Amplify.addPlugin(new AWSCognitoAuthPlugin());
-            Amplify.configure(getApplicationContext());
-
-            Log.i("MyAmplifyApp", "Initialized Amplify.");
-        } catch (AmplifyException error) {
-            Log.e("MyAmplifyApp", "Could not initialize Amplify.", error);
-        }
-
         mAuth = FirebaseAuth.getInstance();
         messageSenderID = mAuth.getCurrentUser().getUid();
         RootRef = FirebaseDatabase.getInstance().getReference();
@@ -250,9 +240,10 @@ public class GroupChatActivity extends AppCompatActivity implements View.OnClick
             JSONObject json = new JSONObject();
             String body = json.put("data", chatFeatures).toString().replaceAll("\"", "\\\"");
 
+            // Initialize the Amazon Cognito credentials provider
             CognitoCachingCredentialsProvider credentialsProvider = new CognitoCachingCredentialsProvider(
                     getApplicationContext(),
-                    "us-west-2:f864c27f-6ff3-461a-a031-02c2884a1af0", // Identity pool ID
+                    "us-west-2:1d4dafa9-7c5a-4199-87a4-c8f250f57ded", // Identity pool ID
                     Regions.US_WEST_2 // Region
             );
 

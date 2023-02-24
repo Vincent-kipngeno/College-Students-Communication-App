@@ -6,4 +6,17 @@
         android:orderInCategory="100"
         android:title="Log Out"
         app:showAsAction="never" />
+
+    <item
+        android:id="@+id/action_createGroup"
+        android:orderInCategory="100"
+        android:title="Create Group"
+        app:showAsAction="never" />
+
+    <item
+        android:id="@+id/show_hidden_messages"
+        android:orderInCategory="100"
+        android:title="Show hidden messages"
+        android:checkable="true"
+        app:showAsAction="never"/>
 </menu>

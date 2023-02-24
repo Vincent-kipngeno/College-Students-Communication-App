@@ -119,7 +119,7 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
     }
 
     public void sendUserToJoinGroupActivity(){
-        Intent mainIntent = new Intent(LoginActivity.this, JoinGroupActivity.class);
+        Intent mainIntent = new Intent(LoginActivity.this, GroupsListActivity.class);
         mainIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
         startActivity(mainIntent);
         finish();

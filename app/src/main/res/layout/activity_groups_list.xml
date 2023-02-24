@@ -4,8 +4,25 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@color/backgroundColor"
-    tools:context=".JoinGroupActivity">
+    android:background="@android:color/background_dark"
+    tools:context=".GroupsListActivity">
+
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/groupsRecyclerView"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_marginBottom="6dp" />
+
+    <com.google.android.material.floatingactionbutton.FloatingActionButton
+        android:id="@+id/fab"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="end|bottom"
+        android:layout_alignParentEnd="true"
+        android:layout_alignParentBottom="true"
+        android:src="@drawable/add"
+        android:contentDescription="@string/add"
+        android:layout_margin="16dp" />
 
     <LinearLayout
         android:id="@+id/linearLayout"
@@ -16,25 +33,22 @@
         android:padding="20dp"
         android:gravity="center_horizontal">
 
-        <EditText
+        <TextView
             android:id="@+id/groupCodeEditText"
             android:layout_width="wrap_content"
-            android:layout_height="50dp"
-            android:background="@drawable/edit_text_bg"
+            android:layout_height="wrap_content"
             android:layout_marginStart="5dp"
-            android:hint="@string/enter_code"
-            android:inputType="textEmailAddress"
-            android:nextFocusDown="@+id/passwordEditText"
+            android:text="No Groups yet. Add one here"
             android:paddingStart="30dp"
             android:paddingEnd="30dp"
-            android:textColor="@color/white"
+            android:textColor="@color/secondaryColor"
             android:textColorHint="@color/secondaryColor"
             android:textSize="20sp" />
 
 
 
         <Button
-            android:id="@+id/joinGroupButton"
+            android:id="@+id/addGroupButton"
             android:layout_width="115dp"
             android:layout_height="48dp"
             android:layout_marginTop="15dp"
@@ -42,7 +56,7 @@
             android:paddingStart="25dp"
             android:paddingEnd="25dp"
             android:src="@drawable/password"
-            android:text="@string/join"
+            android:text="Add"
             android:textColor="#FFFFFFFF"
             tools:ignore="TouchTargetSizeCheck,TouchTargetSizeCheck" />
 

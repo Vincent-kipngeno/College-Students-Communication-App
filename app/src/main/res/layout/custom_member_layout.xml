@@ -5,77 +5,70 @@
     android:layout_height="wrap_content"
     android:background="@color/backgroundColor"
     android:padding="5dp"
-    android:layout_marginBottom="2dp"
     xmlns:app="http://schemas.android.com/apk/res-auto">
 
     <de.hdodenhof.circleimageview.CircleImageView
         android:id="@+id/profileImg"
-        android:layout_width="60dp"
-        android:layout_height="60dp"
+        android:layout_width="50dp"
+        android:layout_height="50dp"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintBottom_toBottomOf="parent"
-        android:src="@drawable/group"
-        android:padding="5dp"
-        android:layout_marginEnd="20dp"/>
+        android:src="@drawable/avatar"
+        android:padding="10dp"/>
 
     <TextView
-        android:id="@+id/groupNameTxt"
+        android:id="@+id/userName"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintStart_toEndOf="@id/profileImg"
-        android:textSize="20sp"
-        android:text="Bachelors SE"
-        android:textColor="@color/white"
-        android:paddingBottom="5dp"
-        android:layout_marginStart="5dp"
-        android:layout_marginTop="5dp"/>
-
-    <TextView
-        android:id="@+id/latestMessageTxt"
-        android:layout_width="280dp"
-        android:layout_height="wrap_content"
-        app:layout_constraintTop_toBottomOf="@id/groupNameTxt"
-        app:layout_constraintStart_toEndOf="@id/profileImg"
-        app:layout_constraintBottom_toBottomOf="parent"
-        android:paddingEnd="30dp"
-        android:text="@string/hello"
         android:textSize="16sp"
-        android:layout_marginStart="5dp"
+        android:text="Vincent Kipngeno"
         android:textColor="@color/secondaryColor"
-        android:ellipsize="end"
-        android:singleLine="true"/>
+        android:layout_marginBottom="2dp"
+        android:layout_marginTop="10dp"/>
 
     <TextView
-        android:id="@+id/receivedMessageTime"
+        android:id="@+id/phone"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        app:layout_constraintTop_toTopOf="@id/latestMessageTxt"
-        app:layout_constraintBottom_toBottomOf="@id/latestMessageTxt"
-        app:layout_constraintEnd_toEndOf="parent"
-        android:text="@string/_10_20"
+        app:layout_constraintTop_toBottomOf="@id/userName"
+        app:layout_constraintStart_toEndOf="@id/profileImg"
+        app:layout_constraintBottom_toTopOf="@+id/lowerLine"
+        android:layout_marginBottom="5dp"
+        android:text="@string/hello"
         android:textSize="16sp"
         android:textColor="@color/secondaryColor"/>
 
     <LinearLayout
+        android:id="@+id/containerBox"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintBottom_toTopOf="@id/receivedMessageTime"
+        app:layout_constraintBottom_toTopOf="@+id/lowerLine"
         app:layout_constraintEnd_toEndOf="parent"
-        android:layout_marginEnd="10dp"
-        android:background="@drawable/send_circle"
+        android:background="@drawable/tick_background"
         android:orientation="vertical">
 
-        <TextView
-            android:id="@+id/unreadMessages"
+        <ImageView
+            android:id="@+id/tickedBox"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="1"
-            android:padding="8dp"
+            android:src="@drawable/tickedbox"
+            android:text="@string/_10_20"
             android:textSize="16sp"
-            android:textColor="@color/white"/>
+            android:textColor="@color/secondaryColor"
+            android:visibility="invisible"/>
     </LinearLayout>
+
+    <View
+        android:id="@+id/lowerLine"
+        android:layout_width="match_parent"
+        android:layout_height="1dp"
+        android:background="@color/secondaryColor"
+        app:layout_goneMarginTop="5dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        tools:layout_editor_absoluteX="-36dp" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

@@ -11,16 +11,31 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.CollegeStudentsCommunicationApp">
         <activity
-            android:name=".GroupChatActivity"
-            android:parentActivityName=".JoinGroupActivity"
-            android:exported="false" />
+            android:name=".CreateGroupActivity"
+            android:exported="false">
+            <meta-data
+                android:name="android.app.lib_name"
+                android:value="" />
+        </activity>
         <activity
-            android:name=".JoinGroupActivity"
+            android:name=".AddMembersActivity"
+            android:exported="false">
+            <meta-data
+                android:name="android.app.lib_name"
+                android:value="" />
+        </activity>
+        <activity
+            android:name=".GroupChatActivity"
+            android:exported="false"
+            android:parentActivityName=".GroupsListActivity"
+            android:theme="@style/AppTheme"/>
+        <activity
+            android:name=".GroupsListActivity"
             android:exported="false" />
         <activity
             android:name=".RegistrationActivity"
-            android:label="Sign Up"
-            android:exported="false" />
+            android:exported="false"
+            android:label="Sign Up" />
         <activity
             android:name=".LoginActivity"
             android:exported="true">

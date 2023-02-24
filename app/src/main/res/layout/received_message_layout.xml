@@ -3,8 +3,7 @@
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:background="@android:color/transparent"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
-    android:paddingEnd="40dp">
+    xmlns:app="http://schemas.android.com/apk/res-auto">
 
     <TextView
         android:id="@+id/senderName"
@@ -25,10 +24,21 @@
         app:layout_constraintTop_toBottomOf="@id/senderName"
         app:layout_constraintStart_toStartOf="parent"
         android:background="@drawable/received_bubble_tail"
-        android:text="@string/hello"
+        android:text="vghfbdyuhlgysihyufgydgyuhgyufguigyighuilfgukgfyuhfgyghyighyughyugyghyighyhfbyiwgyu"
         android:textSize="16sp"
         android:textColor="@color/white"
-        android:padding="10dp"/>
+        android:padding="10dp"
+        android:maxWidth="300dp"/>
+
+    <ImageView
+        android:id="@+id/reportIcon"
+        android:layout_width="40dp"
+        android:layout_height="40dp"
+        app:layout_constraintStart_toEndOf="@id/receivedMessageText"
+        app:layout_constraintTop_toTopOf="@id/receivedMessageText"
+        app:layout_constraintBottom_toBottomOf="@id/receivedMessageText"
+        android:src="@drawable/report"
+        android:visibility="invisible"/>
 
     <TextView
         android:id="@+id/receivedMessageTime"

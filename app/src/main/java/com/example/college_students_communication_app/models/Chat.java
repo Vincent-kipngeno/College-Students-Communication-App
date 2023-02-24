@@ -10,20 +10,31 @@ import java.util.Map;
 
 public class Chat {
 
-    public String message, senderId, groupCode;
+    public String message, senderId, groupCode, chatId;
     public int label;
     public long time;
+    public boolean isInfo;
 
     public Chat(){
 
     }
 
-    public Chat(String message, String senderId, long time, String groupCode, int label) {
+    public Chat(String message, String senderId, long time, String groupCode, int label, String chatId) {
         this.message = message;
         this.senderId = senderId;
         this.time = time;
         this.groupCode = groupCode;
         this.label = label;
+        this.isInfo = false;
+        this.chatId = chatId;
+    }
+
+    public String getChatId() {
+        return chatId;
+    }
+
+    public void setChatId(String chatId) {
+        this.chatId = chatId;
     }
 
     public int getLabel() {
@@ -64,6 +75,14 @@ public class Chat {
 
     public void setGroupCode(String groupCode) {
         this.groupCode = groupCode;
+    }
+
+    public boolean isInfo() {
+        return isInfo;
+    }
+
+    public void setInfo(boolean info) {
+        isInfo = info;
     }
 
 

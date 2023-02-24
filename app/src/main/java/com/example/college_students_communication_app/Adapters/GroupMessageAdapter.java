@@ -4,6 +4,7 @@ import android.graphics.Color;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageView;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
@@ -32,6 +33,7 @@ public class GroupMessageAdapter extends RecyclerView.Adapter<GroupMessageAdapte
     private DatabaseReference usersRef;
     private String currentUid;
     private DatabaseReference mRootRef;
+    private boolean showHidden;
 
     final int LAYOUT_SENT = 0;
     final int LAYOUT_RECEIVED = 1;
@@ -40,6 +42,10 @@ public class GroupMessageAdapter extends RecyclerView.Adapter<GroupMessageAdapte
     public GroupMessageAdapter(List<Chat> groupMessages)
     {
         this.groupMessages = groupMessages;
+    }
+
+    public void setHidden(boolean isHidden){
+        showHidden = isHidden;
     }
 
     @Override
@@ -104,6 +110,15 @@ public class GroupMessageAdapter extends RecyclerView.Adapter<GroupMessageAdapte
         }
 
         public void bindViews(Chat chat){
+            ImageView reportImage = itemView.findViewById(R.id.reportIcon);
+
+            if (chat.getLabel() == 0){
+                reportImage.setVisibility(View.VISIBLE);
+            }
+            else {
+                reportImage.setVisibility(View.INVISIBLE);
+            }
+
             Calendar calendar = Calendar.getInstance();
             calendar.setTimeInMillis(chat.getTime());
 

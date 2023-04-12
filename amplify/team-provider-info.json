@@ -1,0 +1,30 @@
+{
+  "dev": {
+    "awscloudformation": {
+      "AuthRoleName": "amplify-collegestudentscommu-dev-143833-authRole",
+      "UnauthRoleArn": "arn:aws:iam::162126381597:role/amplify-collegestudentscommu-dev-143833-unauthRole",
+      "AuthRoleArn": "arn:aws:iam::162126381597:role/amplify-collegestudentscommu-dev-143833-authRole",
+      "Region": "us-west-2",
+      "DeploymentBucketName": "amplify-collegestudentscommu-dev-143833-deployment",
+      "UnauthRoleName": "amplify-collegestudentscommu-dev-143833-unauthRole",
+      "StackName": "amplify-collegestudentscommu-dev-143833",
+      "StackId": "arn:aws:cloudformation:us-west-2:162126381597:stack/amplify-collegestudentscommu-dev-143833/7437b7f0-b2a5-11ed-abef-0af95a9e8a2f",
+      "AmplifyAppId": "d3p5hreoph9jec",
+      "APIGatewayAuthURL": "https://s3.amazonaws.com/amplify-collegestudentscommu-dev-143833-deployment/amplify-cfn-templates/api/APIGatewayAuthStack.json"
+    },
+    "categories": {
+      "function": {
+        "todo": {
+          "deploymentBucketName": "amplify-collegestudentscommu-dev-143833-deployment",
+          "s3Key": "amplify-builds/todo-436e66785a6e4d647a32-build.zip"
+        }
+      },
+      "auth": {
+        "collegestudentscommu": {}
+      },
+      "api": {
+        "api": {}
+      }
+    }
+  }
+}

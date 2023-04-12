@@ -15,12 +15,12 @@ import android.os.Handler;
 import android.os.HandlerThread;
 import android.text.TextUtils;
 import android.util.Log;
+import android.view.ActionMode;
 import android.view.LayoutInflater;
 import android.view.Menu;
+import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
-import android.widget.ImageView;
-import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -29,6 +29,8 @@ import com.amazonaws.regions.Regions;
 import com.amplifyframework.api.rest.RestOptions;
 import com.amplifyframework.core.Amplify;
 import com.example.college_students_communication_app.Adapters.GroupMessageAdapter;
+import com.example.college_students_communication_app.Utils.AlertDialogHelper;
+import com.example.college_students_communication_app.Utils.RecyclerItemClickListener;
 import com.example.college_students_communication_app.contracts.ChatDataReaderContract;
 import com.example.college_students_communication_app.contracts.ChatReaderDbHelper;
 import com.example.college_students_communication_app.databinding.ActivityGroupChatBinding;
@@ -56,8 +58,10 @@ import java.util.Map;
 
 import de.hdodenhof.circleimageview.CircleImageView;
 
-public class GroupChatActivity extends AppCompatActivity implements View.OnClickListener {
+public class GroupChatActivity extends AppCompatActivity implements View.OnClickListener, AlertDialogHelper.AlertDialogListener{
 
+    ActionMode mActionMode;
+    Menu context_menu;
     private ActivityGroupChatBinding binding;
 
     private FirebaseAuth mAuth;
@@ -69,9 +73,11 @@ public class GroupChatActivity extends AppCompatActivity implements View.OnClick
     private BertTransformer bertTransformer;
     private Handler handler;
 
-    private final List<Chat> chats = new ArrayList<>();
+    private List<Chat> chats_list = new ArrayList<>();
+    private List<Chat> selected_chatsList = new ArrayList<>();
+    private List<Chat> multiselect_list = new ArrayList<>();
     private LinearLayoutManager linearLayoutManager;
-    private GroupMessageAdapter groupMessageAdapter;
+    private GroupMessageAdapter groupMessagesAdapter;
     private TextView groupName, groupDescription;
     private CircleImageView groupImage;
 
@@ -81,6 +87,10 @@ public class GroupChatActivity extends AppCompatActivity implements View.OnClick
     private boolean showHidden = false;
 
     private Group group;
+
+    boolean isMultiSelect = false;
+
+    AlertDialogHelper alertDialogHelper;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -97,6 +107,7 @@ public class GroupChatActivity extends AppCompatActivity implements View.OnClick
 
         groupCode = getIntent().getExtras().get("groupCode").toString();
         showHidden = (Boolean) getIntent().getExtras().get("showHidden");
+        alertDialogHelper =new AlertDialogHelper(this);
 
         IntializeControllers();
 
@@ -123,11 +134,37 @@ public class GroupChatActivity extends AppCompatActivity implements View.OnClick
             }
         });
 
-        groupMessageAdapter = new GroupMessageAdapter(chats);
+        groupMessagesAdapter = new GroupMessageAdapter(this, chats_list, selected_chatsList);
         linearLayoutManager = new LinearLayoutManager(this);
         linearLayoutManager.setStackFromEnd(true);
         binding.groupChatMessages.setLayoutManager(linearLayoutManager);
-        binding.groupChatMessages.setAdapter(groupMessageAdapter);
+        binding.groupChatMessages.setAdapter(groupMessagesAdapter);
+
+        binding.groupChatMessages.addOnItemTouchListener(new RecyclerItemClickListener(this, binding.groupChatMessages, new RecyclerItemClickListener.OnItemClickListener() {
+            @Override
+            public void onItemClick(View view, int position) {
+                if (isMultiSelect)
+                    multi_select(position);
+                else
+                    Toast.makeText(getApplicationContext(), "Details Page", Toast.LENGTH_SHORT).show();
+            }
+
+            @Override
+            public void onItemLongClick(View view, int position) {
+                if (!isMultiSelect) {
+                    multiselect_list = new ArrayList<Chat>();
+                    isMultiSelect = true;
+
+                    if (mActionMode == null) {
+                        mActionMode = startActionMode(mActionModeCallback);
+                    }
+                }
+
+                multi_select(position);
+
+            }
+        }));
+
 
         binding.sendMessageButton.setOnClickListener(this);
 
@@ -179,6 +216,7 @@ public class GroupChatActivity extends AppCompatActivity implements View.OnClick
     };*/
 
     ChildEventListener childEventListener = new ChildEventListener() {
+        boolean chatExists = false;
         @Override
         public void onChildAdded(DataSnapshot dataSnapshot, String previousChildName) {
             Log.d("GroupChatActivity", "onChildAdded:" + dataSnapshot.getKey());
@@ -190,8 +228,8 @@ public class GroupChatActivity extends AppCompatActivity implements View.OnClick
                 if (!showHidden && chat.getLabel() == 0) {
                     ;
                 }else {
-                    chats.add(chat);
-                    groupMessageAdapter.notifyDataSetChanged();
+                    chats_list.add(chat);
+                    groupMessagesAdapter.notifyDataSetChanged();
 
                     binding.groupChatMessages.smoothScrollToPosition(binding.groupChatMessages.getAdapter().getItemCount());
                 }
@@ -202,10 +240,40 @@ public class GroupChatActivity extends AppCompatActivity implements View.OnClick
         public void onChildChanged(DataSnapshot dataSnapshot, String previousChildName) {
             if (dataSnapshot.exists()){
                 Chat chat = dataSnapshot.getValue(Chat.class);
-                chats.add(chat);
-                groupMessageAdapter.notifyDataSetChanged();
 
-                binding.groupChatMessages.smoothScrollToPosition(binding.groupChatMessages.getAdapter().getItemCount());
+                int index = 0;
+
+                for (int i = chats_list.size()-1; i >= 0; i--) {
+                    if (chat.getChatId().equals(chats_list.get(i).getChatId())){
+                        index = i;
+                        chatExists = true;
+                        break;
+                    }
+                }
+
+                if (chatExists){
+                    if (!showHidden && chat.getLabel() == 0){
+                        chats_list.remove(index);
+                        groupMessagesAdapter.notifyItemRemoved(index);
+                        binding.groupChatMessages.smoothScrollToPosition(binding.groupChatMessages.getAdapter().getItemCount());
+                    }
+                    else {
+                        chats_list.set(index, chat);
+                        groupMessagesAdapter.notifyItemChanged(index);
+                        binding.groupChatMessages.smoothScrollToPosition(binding.groupChatMessages.getAdapter().getItemCount());
+                    }
+                }
+                else {
+                    if (!showHidden && chat.getLabel() == 0) {
+                        ;
+                    }else {
+                        chats_list.add(chat);
+                        groupMessagesAdapter.notifyDataSetChanged();
+                        binding.groupChatMessages.smoothScrollToPosition(binding.groupChatMessages.getAdapter().getItemCount());
+                    }
+                }
+
+                chatExists = false;
             }
         }
 
@@ -248,7 +316,7 @@ public class GroupChatActivity extends AppCompatActivity implements View.OnClick
             }
         });
 
-        chats.clear();
+        chats_list.clear();
         RootRef.child("Messages").child(groupCode).addChildEventListener(childEventListener);
 
         handler.post(
@@ -334,9 +402,9 @@ public class GroupChatActivity extends AppCompatActivity implements View.OnClick
     }
 
     public void updateChatsView(){
-        chats.clear();
-        chats.addAll(getChatsFromSqlLite());
-        groupMessageAdapter.notifyDataSetChanged();
+        chats_list.clear();
+        chats_list.addAll(getChatsFromSqlLite());
+        groupMessagesAdapter.notifyDataSetChanged();
         binding.groupChatMessages.smoothScrollToPosition(binding.groupChatMessages.getAdapter().getItemCount());
     }
 
@@ -427,12 +495,12 @@ public class GroupChatActivity extends AppCompatActivity implements View.OnClick
         }
     }
 
-    /*@Override
+    @Override
     public boolean onCreateOptionsMenu (Menu menu)
 
     {
         getMenuInflater().inflate(R.menu.chats_menu, menu);
-        final MenuItem item = menu.findItem(R.id.show_hidden);
+        /*final MenuItem item = menu.findItem(R.id.show_hidden);
         item.getActionView().setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -453,7 +521,7 @@ public class GroupChatActivity extends AppCompatActivity implements View.OnClick
                     Toast.makeText(getApplication(), "Track Hidden", Toast.LENGTH_SHORT).show();
                 }
             }
-        });
+        });*/
         return true;
     }
 
@@ -467,7 +535,7 @@ public class GroupChatActivity extends AppCompatActivity implements View.OnClick
                 showHidden = !showHidden;
 
                 RootRef.child("Messages").child(groupCode).removeEventListener(childEventListener);
-                chats.clear();
+                chats_list.clear();
                 RootRef.child("Messages").child(groupCode).addChildEventListener(childEventListener);
 
                 if (item.isChecked())
@@ -478,10 +546,110 @@ public class GroupChatActivity extends AppCompatActivity implements View.OnClick
                 else
                 {
                     item.setChecked(true);
-                    Toast.makeText(getApplication(), "Track Hidden", Toast.LENGTH_SHORT).show();
+                    //Toast.makeText(getApplication(), "Track Hidden", Toast.LENGTH_SHORT).show();
                 }
                 break;
         }
         return true;
-    }*/
+    }
+
+    public void multi_select(int position) {
+        if (mActionMode != null) {
+            if (multiselect_list.contains(chats_list.get(position)))
+                multiselect_list.remove(chats_list.get(position));
+            else
+                multiselect_list.add(chats_list.get(position));
+
+            if (multiselect_list.size() > 0)
+                mActionMode.setTitle("" + multiselect_list.size());
+            else
+                mActionMode.setTitle("");
+
+            refreshAdapter();
+
+        }
+    }
+
+
+    public void refreshAdapter()
+    {
+        groupMessagesAdapter.selectedMessages=multiselect_list;
+        groupMessagesAdapter.groupMessages=chats_list;
+        groupMessagesAdapter.notifyDataSetChanged();
+    }
+
+    private ActionMode.Callback mActionModeCallback = new ActionMode.Callback() {
+
+        @Override
+        public boolean onCreateActionMode(ActionMode mode, Menu menu) {
+            // Inflate a menu resource providing context menu items
+            MenuInflater inflater = mode.getMenuInflater();
+            inflater.inflate(R.menu.menu_multi_select, menu);
+            context_menu = menu;
+            return true;
+        }
+
+        @Override
+        public boolean onPrepareActionMode(ActionMode mode, Menu menu) {
+            return false; // Return false if nothing is done
+        }
+
+        @Override
+        public boolean onActionItemClicked(ActionMode mode, MenuItem item) {
+            switch (item.getItemId()) {
+                case R.id.action_delete:
+                    alertDialogHelper.showAlertDialog("","Delete Contact","DELETE","CANCEL",1,false);
+                    return true;
+                default:
+                    return false;
+            }
+        }
+
+        @Override
+        public void onDestroyActionMode(ActionMode mode) {
+            mActionMode = null;
+            isMultiSelect = false;
+            multiselect_list = new ArrayList<Chat>();
+            refreshAdapter();
+        }
+    };
+
+    // AlertDialog Callback Functions
+
+    @Override
+    public void onPositiveClick(int from) {
+        if(from==1)
+        {
+            if(multiselect_list.size()>0)
+            {
+                for(int i=0;i<multiselect_list.size();i++){
+                    RootRef.child("Messages").child(groupCode).child(multiselect_list.get(i).getChatId()).setValue(null);
+                    chats_list.remove(multiselect_list.get(i));
+                }
+
+                groupMessagesAdapter.notifyDataSetChanged();
+
+                if (mActionMode != null) {
+                    mActionMode.finish();
+                }
+                //Toast.makeText(getApplicationContext(), "Delete Click", Toast.LENGTH_SHORT).show();
+            }
+        }
+        else if(from==2)
+        {
+            if (mActionMode != null) {
+                mActionMode.finish();
+            }
+        }
+    }
+
+    @Override
+    public void onNegativeClick(int from) {
+
+    }
+
+    @Override
+    public void onNeutralClick(int from) {
+
+    }
 }

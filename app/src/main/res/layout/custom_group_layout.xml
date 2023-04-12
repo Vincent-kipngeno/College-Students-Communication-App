@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/custom_group_layout"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:background="@color/backgroundColor"
@@ -15,7 +16,6 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintBottom_toBottomOf="parent"
-        android:src="@drawable/group"
         android:padding="5dp"
         android:layout_marginEnd="20dp"/>
 
@@ -26,7 +26,7 @@
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintStart_toEndOf="@id/profileImg"
         android:textSize="20sp"
-        android:text="Bachelors SE"
+        android:text=""
         android:textColor="@color/white"
         android:paddingBottom="5dp"
         android:layout_marginStart="5dp"
@@ -40,7 +40,7 @@
         app:layout_constraintStart_toEndOf="@id/profileImg"
         app:layout_constraintBottom_toBottomOf="parent"
         android:paddingEnd="30dp"
-        android:text="@string/hello"
+        android:text=""
         android:textSize="16sp"
         android:layout_marginStart="5dp"
         android:textColor="@color/secondaryColor"
@@ -54,11 +54,12 @@
         app:layout_constraintTop_toTopOf="@id/latestMessageTxt"
         app:layout_constraintBottom_toBottomOf="@id/latestMessageTxt"
         app:layout_constraintEnd_toEndOf="parent"
-        android:text="@string/_10_20"
+        android:text=""
         android:textSize="16sp"
         android:textColor="@color/secondaryColor"/>
 
     <LinearLayout
+        android:id="@+id/unreadMessagesLayout"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         app:layout_constraintTop_toTopOf="parent"
@@ -66,7 +67,8 @@
         app:layout_constraintEnd_toEndOf="parent"
         android:layout_marginEnd="10dp"
         android:background="@drawable/send_circle"
-        android:orientation="vertical">
+        android:orientation="vertical"
+        android:visibility="invisible">
 
         <TextView
             android:id="@+id/unreadMessages"

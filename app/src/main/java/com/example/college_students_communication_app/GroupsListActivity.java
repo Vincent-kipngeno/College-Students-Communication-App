@@ -8,6 +8,7 @@ import androidx.recyclerview.widget.RecyclerView;
 import android.content.Intent;
 import android.os.Bundle;
 import android.text.TextUtils;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -17,11 +18,14 @@ import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.example.college_students_communication_app.Adapters.GroupsAdapter;
 import com.example.college_students_communication_app.databinding.ActivityGroupsListBinding;
+import com.example.college_students_communication_app.models.Chat;
 import com.example.college_students_communication_app.models.Group;
 import com.firebase.ui.database.FirebaseRecyclerAdapter;
 import com.firebase.ui.database.FirebaseRecyclerOptions;
 import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.database.ChildEventListener;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
@@ -30,7 +34,9 @@ import com.google.firebase.database.Query;
 import com.google.firebase.database.ValueEventListener;
 import com.squareup.picasso.Picasso;
 
+import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.List;
 import java.util.Locale;
 
 public class GroupsListActivity extends AppCompatActivity implements View.OnClickListener {
@@ -38,19 +44,195 @@ public class GroupsListActivity extends AppCompatActivity implements View.OnClic
     private ActivityGroupsListBinding binding;
     private FirebaseAuth mAuth;
     private DatabaseReference RootRef;
+    private GroupsAdapter groupsAdapter;
+    private final List<Group> groups = new ArrayList<>();
 
     private Query sortedGroupsQuery;
-    FirebaseRecyclerAdapter<Group, GroupsViewHolder> adapter;
 
     private boolean showHidden = false;
+
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        binding = ActivityGroupsListBinding.inflate(getLayoutInflater());
+        View view = binding.getRoot();
+        setContentView(view);
+
+        mAuth = FirebaseAuth.getInstance();
+        RootRef = FirebaseDatabase.getInstance().getReference();
+
+        groupsAdapter = new GroupsAdapter(GroupsListActivity.this, groups, showHidden);
+        LinearLayoutManager linearLayoutManager = new LinearLayoutManager(this);
+        //linearLayoutManager.setReverseLayout(true);
+        //linearLayoutManager.setStackFromEnd(true);
+        binding.groupsRecyclerView.setLayoutManager(linearLayoutManager);
+        binding.groupsRecyclerView.setAdapter(groupsAdapter);
+
+        binding.addGroupButton.setOnClickListener(this);
+        binding.fab.setOnClickListener(this);
+    }
+
+    ValueEventListener valueEventListener = new ValueEventListener() {
+        @Override
+        public void onDataChange(@NonNull DataSnapshot snapshot) {
+
+            if (snapshot.exists()){
+                int last = groups.size();
+                groups.clear();
+                groupsAdapter.notifyItemRangeRemoved(0, last);
+
+                for (DataSnapshot data: snapshot.getChildren()){
+                    Group group = data.getValue(Group.class);
+
+                    RootRef.child("Memberships").child("users").child(mAuth.getUid()).child(group.groupId).addListenerForSingleValueEvent(new ValueEventListener() {
+                        @Override
+                        public void onDataChange(DataSnapshot dataSnapshot) {
+                            if (dataSnapshot.exists()){
+                                if (groups.size() == 0){
+                                    groups.add(group);
+                                    groupsAdapter.notifyItemInserted(0);
+                                }
+                                else{
+                                    if (groups.get(0).getTimeStamp() < group.getTimeStamp()){
+                                        groups.add(0, group);
+                                        groupsAdapter.notifyItemInserted(0);
+                                    }
+                                    else{
+                                        groups.add(1, group);
+                                        groupsAdapter.notifyItemInserted(1);
+                                    }
+                                }
+                                groupsAdapter.notifyDataSetChanged();
+                            }
+                        }
+
+                        @Override
+                        public void onCancelled(DatabaseError databaseError) {}
+                    });
+                }
+            }
+        }
+
+        @Override
+        public void onCancelled(@NonNull DatabaseError error) {
+
+        }
+    };
+
+    ChildEventListener childEventListener = new ChildEventListener() {
+        boolean groupExists = false;
+        @Override
+        public void onChildAdded(DataSnapshot dataSnapshot, String previousChildName) {
+            Log.d("GroupsListActivity", "onChildAdded:" + dataSnapshot.getKey());
+
+            if (dataSnapshot.exists()){
+                int last = groups.size();
+                groups.clear();
+                groupsAdapter.notifyItemRangeRemoved(0, last);
+                Group group = dataSnapshot.getValue(Group.class);
+
+                RootRef.child("Memberships").child("groups").child(group.groupId).child(mAuth.getUid()).addListenerForSingleValueEvent(new ValueEventListener() {
+                    @Override
+                    public void onDataChange(DataSnapshot dataSnapshot) {
+                        if (dataSnapshot.exists()){
+                            if (groups.size() == last){
+                                groups.add(group);
+                            }
+                            else {
+                                groups.add(0, group);
+                            }
+                            groupsAdapter.notifyDataSetChanged();
+                        }
+                    }
+
+                    @Override
+                    public void onCancelled(DatabaseError databaseError) {}
+                });
+            }
+        }
+
+        @Override
+        public void onChildChanged(DataSnapshot dataSnapshot, String previousChildName) {
+            /*if (dataSnapshot.exists()){
+                Group group = dataSnapshot.getValue(Group.class);
+
+                RootRef.child("Memberships").child("groups").child(group.groupId).child(mAuth.getUid()).addListenerForSingleValueEvent(new ValueEventListener() {
+                    @Override
+                    public void onDataChange(DataSnapshot dataSnapshot) {
+                        if (dataSnapshot.exists()){
+                            int index = 0;
+
+                            for (int i = groups.size()-1; i >= 0; i--) {
+                                if (group.getGroupId().equals(groups.get(i).getGroupId())){
+                                    index = i;
+                                    groupExists = true;
+                                    break;
+                                }
+                            }
+
+                            if (groupExists){
+                                //groups.remove(index);
+                                //groupsAdapter.notifyItemRemoved(index);
+                            }
+                            groups.add(group);
+                            groupsAdapter.notifyDataSetChanged();
+                            groupExists = false;
+                        }
+                    }
+
+                    @Override
+                    public void onCancelled(DatabaseError databaseError) {}
+                });
+            }*/
+        }
+
+        @Override
+        public void onChildRemoved(DataSnapshot dataSnapshot) {
+
+        }
+
+        @Override
+        public void onChildMoved(DataSnapshot dataSnapshot, String previousChildName) {
+            /*if (dataSnapshot.exists()){
+
+                Group group = dataSnapshot.getValue(Group.class);
+                int index = 0;
+
+                for (int i = groups.size()-1; i >= 0; i--) {
+                    if (group.getGroupId().equals(groups.get(i).getGroupId())){
+                        index = i;
+                        groupExists = true;
+                        break;
+                    }
+                }
+
+                if (groupExists){
+                    //groups.remove(index);
+                    //groupsAdapter.notifyItemRemoved(index);
+                }
+                groups.add(group);
+                groupsAdapter.notifyDataSetChanged();
+                groupExists = false;
+            }*/
+        }
+
+        @Override
+        public void onCancelled(DatabaseError databaseError) {
+            Log.w("GroupsListActivity", "getGroups:onCancelled", databaseError.toException());
+            Toast.makeText(GroupsListActivity.this, "Failed to load groups.",
+                    Toast.LENGTH_SHORT).show();
+        }
+    };
 
     @Override
     protected void onStart() {
         super.onStart();
 
         sortedGroupsQuery = RootRef.child("Groups").orderByChild("timeStamp");
+        sortedGroupsQuery.addValueEventListener(valueEventListener);
+        binding.linearLayout.setVisibility(View.GONE);
 
-        FirebaseRecyclerOptions<Group> options =
+        /*FirebaseRecyclerOptions<Group> options =
                 new FirebaseRecyclerOptions.Builder<Group>()
                         .setQuery(sortedGroupsQuery, Group.class)
                         .build();
@@ -66,6 +248,12 @@ public class GroupsListActivity extends AppCompatActivity implements View.OnClic
                     public void onDataChange(DataSnapshot dataSnapshot) {
                         if (dataSnapshot.exists()){
                             groupsViewHolder.bindViews(group, dataSnapshot.getValue(Long.class));
+                            //groupsViewHolder.itemView.findViewById(R.id.custom_group_layout).setVisibility(View.VISIBLE);
+                            //groupsViewHolder.itemView.findViewById(R.id.custom_group_layout).setLayoutParams(new RecyclerView.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT));
+                        }
+                        else {
+                            //groupsViewHolder.itemView.findViewById(R.id.custom_group_layout).setLayoutParams(new RecyclerView.LayoutParams(0, 0));
+                            groupsViewHolder.itemView.findViewById(R.id.custom_group_layout).setVisibility(View.GONE);
                         }
                     }
 
@@ -81,34 +269,15 @@ public class GroupsListActivity extends AppCompatActivity implements View.OnClic
 
                 return new GroupsViewHolder(view);
             }
-        };
-
-        LinearLayoutManager linearLayoutManager = new LinearLayoutManager(this);
-        linearLayoutManager.setReverseLayout(true);
-        linearLayoutManager.setStackFromEnd(true);
-        binding.groupsRecyclerView.setLayoutManager(linearLayoutManager);
-        binding.groupsRecyclerView.setAdapter(adapter);
-        adapter.startListening();
+        };*/
+        //adapter.startListening();
     }
 
     @Override
     protected void onStop() {
         super.onStop();
-        adapter.stopListening();
-    }
-
-    @Override
-    protected void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        binding = ActivityGroupsListBinding.inflate(getLayoutInflater());
-        View view = binding.getRoot();
-        setContentView(view);
-
-        mAuth = FirebaseAuth.getInstance();
-        RootRef = FirebaseDatabase.getInstance().getReference();
-
-        binding.addGroupButton.setOnClickListener(this);
-        binding.fab.setOnClickListener(this);
+        //adapter.stopListening();
+        sortedGroupsQuery.removeEventListener(valueEventListener);
     }
 
     @Override
@@ -119,7 +288,7 @@ public class GroupsListActivity extends AppCompatActivity implements View.OnClic
         }
     }
 
-    public class GroupsViewHolder extends RecyclerView.ViewHolder
+    /*public class GroupsViewHolder extends RecyclerView.ViewHolder
     {
 
         private View itemView;
@@ -195,7 +364,7 @@ public class GroupsListActivity extends AppCompatActivity implements View.OnClic
                 }
             });
         }
-    }
+    }*/
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
@@ -238,7 +407,7 @@ public class GroupsListActivity extends AppCompatActivity implements View.OnClic
                 else
                 {
                     item.setChecked(true);
-                    Toast.makeText(getApplication(), "Track Hidden", Toast.LENGTH_SHORT).show();
+                    //Toast.makeText(getApplication(), "Track Hidden", Toast.LENGTH_SHORT).show();
                 }
         }
 

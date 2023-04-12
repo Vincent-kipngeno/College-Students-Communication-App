@@ -1,5 +1,6 @@
 package com.example.college_students_communication_app.Adapters;
 
+import android.content.Context;
 import android.graphics.Color;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -8,6 +9,7 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
+import androidx.core.content.ContextCompat;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.college_students_communication_app.R;
@@ -28,20 +30,25 @@ import java.util.concurrent.TimeUnit;
 
 public class GroupMessageAdapter extends RecyclerView.Adapter<GroupMessageAdapter.ChatViewHolder>
 {
-    private List<Chat> groupMessages;
+    public List<Chat> groupMessages;
+    public List<Chat> selectedMessages;
+
     private FirebaseAuth mAuth;
     private DatabaseReference usersRef;
     private String currentUid;
     private DatabaseReference mRootRef;
     private boolean showHidden;
+    private Context context;
 
     final int LAYOUT_SENT = 0;
     final int LAYOUT_RECEIVED = 1;
 
 
-    public GroupMessageAdapter(List<Chat> groupMessages)
+    public GroupMessageAdapter(Context context, List<Chat> groupMessages, List<Chat> selectedMessages)
     {
         this.groupMessages = groupMessages;
+        this.selectedMessages = selectedMessages;
+        this.context = context;
     }
 
     public void setHidden(boolean isHidden){
@@ -88,6 +95,10 @@ public class GroupMessageAdapter extends RecyclerView.Adapter<GroupMessageAdapte
     @Override
     public void onBindViewHolder(@NonNull final ChatViewHolder chatViewHolder, int i)
     {
+        if(selectedMessages.contains(groupMessages.get(i)))
+            chatViewHolder.itemView.setBackgroundColor(ContextCompat.getColor(context, R.color.backgroundColor));
+        else
+            chatViewHolder.itemView.setBackgroundColor(ContextCompat.getColor(context, R.color.black));
         chatViewHolder.bindViews(groupMessages.get(i));
     }
 

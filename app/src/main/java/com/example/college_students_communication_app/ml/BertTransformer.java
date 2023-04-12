@@ -59,7 +59,7 @@ public class BertTransformer {
   public synchronized void loadDictionary() {
     try {
       loadDictionaryFile(this.context.getAssets());
-      Log.v(TAG, "Dictionary loaded.");
+      //Log.v(TAG, "Dictionary loaded.");
     } catch (IOException ex) {
       Log.e(TAG, ex.getMessage());
     }
@@ -73,8 +73,8 @@ public class BertTransformer {
     ) {
       Gson gson = new Gson();
       Map<String, Double> nDic = gson.fromJson(reader, HashMap.class);
-      for (Map.Entry<String, Double> entry : nDic.entrySet()){
-        Log.i(TAG, entry.getKey()+" :loadDictionaryFile: "+entry.getValue());
+      for (Map.Entry<String, Double> entry : nDic.entrySet()) {
+        //Log.i(TAG, entry.getKey() + " :loadDictionaryFile: " + entry.getValue());
         dic.put(entry.getKey(), entry.getValue().intValue());
       }
     }

@@ -44,9 +44,6 @@ public class AddMembersAdapter extends RecyclerView.Adapter<AddMembersAdapter.Me
     {
         View view;
 
-        view = LayoutInflater.from(viewGroup.getContext())
-                .inflate(R.layout.received_message_layout, viewGroup, false);
-
         mAuth = FirebaseAuth.getInstance();
         mRootRef = FirebaseDatabase.getInstance().getReference();
 
